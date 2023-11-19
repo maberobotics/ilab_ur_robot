@@ -86,7 +86,7 @@ def generate_launch_description():
     declared_arguments.append(
         DeclareLaunchArgument(
             'namespace',
-            default_value='/ur/',
+            default_value='/',
             description='Namespace of launched nodes, useful for multi-robot setup. \
                          If changed than also the namespace in the controllers \
                          configuration needs to be updated. Expected format "<ns>/".',
@@ -97,6 +97,13 @@ def generate_launch_description():
             'start_gazebo',
             default_value='false',
             description='Start Gazebo simulation.',
+        )
+    )
+    declared_arguments.append(
+        DeclareLaunchArgument(
+            'merge_joint_states',
+            default_value='true',
+            description='Merge joint states topics into /joint_states.',
         )
     )
 
@@ -110,6 +117,7 @@ def generate_launch_description():
     base_frame_file = LaunchConfiguration('base_frame_file')
     namespace = LaunchConfiguration('namespace')
     start_gazebo = LaunchConfiguration('start_gazebo')
+    merge_joint_states = LaunchConfiguration('merge_joint_states')
 
     robot_description_content = Command(
       [
@@ -177,14 +185,15 @@ def generate_launch_description():
       namespace=namespace,
     )
 
-    # joint_state_publisher = Node(
-    #     package='joint_state_publisher',
-    #     executable='joint_state_publisher',
-    #     name='joint_state_publisher',
-    #     namespace=namespace,
-    #     parameters=[
-    #         {'source_list': ['/ur_arm/joint_states'], 'rate': 30}],
-    # )
+    joint_state_publisher = Node(
+        package='joint_state_publisher',
+        executable='joint_state_publisher',
+        name='joint_state_publisher',
+        namespace=namespace,
+        parameters=[
+            {'source_list': ['/ur/joint_states'], 'rate': 30}],
+        condition=IfCondition(merge_joint_states),
+    )
 
     rviz_node = Node(
       package='rviz2',
@@ -227,7 +236,7 @@ def generate_launch_description():
       executable='ros2_control_node',
       parameters=[robot_description, robot_controllers],
       output='both',
-    #   remappings=[('/joint_states', '/ur_arm/joint_states')],
+      remappings=[('/joint_states', '/ur/joint_states')],
       namespace=namespace,
       condition=UnlessCondition(use_sim),
     )
@@ -300,7 +309,7 @@ def generate_launch_description():
       delay_joint_state_broadcaster_spawner_after_spawn_entity,
       delay_joint_state_broadcaster_spawner_after_control_node,
       robot_state_publisher_node,
-    #   joint_state_publisher,
+      joint_state_publisher,
       delay_rviz_after_joint_state_broadcaster_spawner,
       control_node,
       delay_robot_controller_spawner_after_joint_state_broadcaster_spawner,
