@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="flexicart">
+  <!-- safety_distance: Minimum safety distance in [m] by which the collision volumes are expanded and which is enforced during robot motions -->
+  <xacro:macro name="flexicart" params="connected_to:='' ns:='' rpy:='0 0 0' xyz:='0 0 0'">
+    <xacro:unless value="${connected_to == ''}">
+      <joint name="${ns}_flexicart_footprint" type="fixed">
+        <parent link="${connected_to}"/>
+        <child link="${ns}_flexicart"/>
+        <origin xyz="${xyz}" rpy="${rpy}"/>
+      </joint>
+    </xacro:unless>
+
+    <material name="Gray">
+      <color rgba="${125/255} ${125/255} ${125/255} 1.0"/>
+    </material>
+
+    <link name="${ns}_flexicart">
+      <visual>
+        <geometry>
+          <!-- <mesh filename="package://ilab_ur_description/meshes/flexicart.stl"/> -->
+          <mesh filename="file://$(find ilab_ur_description)/meshes/flexicart.stl"/>
+        </geometry>
+        <material name="Gray"/>
+      </visual>
+      <collision>
+        <geometry>
+          <!-- <mesh filename="package://ilab_ur_description/meshes/flexicart.stl"/> -->
+          <mesh filename="file://$(find ilab_ur_description)/meshes/flexicart.stl"/>
+        </geometry>
+      </collision>
+      <inertial>
+      <mass value="100" />
+      <inertia ixx="0" ixy = "0" ixz = "0"
+               iyy="0" iyz = "0"
+               izz="0" />
+    </inertial>
+    </link>
+    <link name="${ns}_flexicart_robot_base"/>
+    <joint name="${ns}_flexicart_robot_base" type="fixed">
+      <origin xyz="0 0 0.87" rpy="0 0 0"/>
+      <parent link="${ns}_flexicart"/>
+      <child link="${ns}_flexicart_robot_base"/>
+    </joint>
+  </xacro:macro>
+</robot>

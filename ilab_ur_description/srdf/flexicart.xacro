@@ -1,0 +1,7 @@
+<?xml version="1.0" ?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+  <xacro:macro name="flexicart" params="arm_id:='ur' ">
+    <disable_collisions link1="${arm_id}_flexicart" link2="base_link" reason="Adjacent"/>
+    <disable_collisions link1="${arm_id}_flexicart" link2="base_link_inertia" reason="Adjacent"/>
+  </xacro:macro>
+</robot>

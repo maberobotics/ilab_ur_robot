@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<robot xmlns:xacro="http://wiki.ros.org/xacro" name="$(arg name)">
+
+  <!-- robot name parameter -->
+  <xacro:arg name="name" default="ilab_ur" />
+  <!-- parameters -->
+  <xacro:arg name="prefix" default="" />
+
+  <xacro:include filename="$(find ilab_ur_description)/srdf/ilab_ur_macro.srdf.xacro" />
+  <xacro:include filename="$(find ilab_ur_description)/srdf/flexicart.xacro" />
+
+  <xacro:ilab_ur_macro name="$(arg name)" prefix="$(arg prefix)" />
+  <xacro:flexicart/>
+
+</robot>
