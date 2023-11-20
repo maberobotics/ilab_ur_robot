@@ -85,7 +85,7 @@ def generate_launch_description():
     )
     declared_arguments.append(
         DeclareLaunchArgument(
-            'namespace',
+            'ur_namespace',
             default_value='/',
             description='Namespace of launched nodes, useful for multi-robot setup. \
                          If changed than also the namespace in the controllers \
@@ -115,7 +115,7 @@ def generate_launch_description():
     start_rviz = LaunchConfiguration('start_rviz')
     robot_ip = LaunchConfiguration('robot_ip')
     base_frame_file = LaunchConfiguration('base_frame_file')
-    namespace = LaunchConfiguration('namespace')
+    namespace = LaunchConfiguration('ur_namespace')
     start_gazebo = LaunchConfiguration('start_gazebo')
     merge_joint_states = LaunchConfiguration('merge_joint_states')
 
