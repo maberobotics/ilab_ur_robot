@@ -10,7 +10,7 @@
       </joint>
     </xacro:unless>
 
-    <material name="Gray">
+    <material name="${ns}_gray">
       <color rgba="${125/255} ${125/255} ${125/255} 1.0"/>
     </material>
 
@@ -20,7 +20,7 @@
           <!-- <mesh filename="package://ilab_ur_description/meshes/flexicart.stl"/> -->
           <mesh filename="file://$(find ilab_ur_description)/meshes/flexicart.stl"/>
         </geometry>
-        <material name="Gray"/>
+        <material name="${ns}_gray"/>
       </visual>
       <collision>
         <geometry>
