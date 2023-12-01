@@ -70,8 +70,8 @@ def generate_launch_description():
     declared_arguments.append(
         DeclareLaunchArgument(
             'robot_ip',
-            default_value='0.0.0.0',
-            description='Robot IP of FRI interface',
+            default_value='172.16.0.3',
+            description='Robot IP',
         )
     )
     declared_arguments.append(
@@ -259,6 +259,18 @@ def generate_launch_description():
       arguments=['gripper_controller', '-c', [namespace, 'controller_manager']]
     )
 
+    speed_scaling_state_broadcaster = Node(
+      package='controller_manager',
+      executable='spawner',
+      arguments=['speed_scaling_state_broadcaster', '-c', [namespace, 'controller_manager']]
+    )
+
+    io_and_status_controller = Node(
+      package='controller_manager',
+      executable='spawner',
+      arguments=['io_and_status_controller', '-c', [namespace, 'controller_manager']]
+    )
+
     # Delay `joint_state_broadcaster` after spawn_entity
     delay_joint_state_broadcaster_spawner_after_spawn_entity = RegisterEventHandler(
         event_handler=OnProcessExit(
@@ -266,15 +278,6 @@ def generate_launch_description():
             on_exit=[joint_state_broadcaster_spawner],
         ),
         condition=IfCondition(use_sim),
-    )
-
-    # Delay `joint_state_broadcaster` after control_node
-    delay_joint_state_broadcaster_spawner_after_control_node = RegisterEventHandler(
-        event_handler=OnProcessStart(
-            target_action=control_node,
-            on_start=[joint_state_broadcaster_spawner],
-        ),
-        condition=UnlessCondition(use_sim),
     )
 
     # Delay rviz start after `joint_state_broadcaster`
@@ -286,20 +289,27 @@ def generate_launch_description():
         condition=IfCondition(start_rviz),
     )
 
-    # Delay start of robot_controller after `joint_state_broadcaster`
-    delay_robot_controller_spawner_after_joint_state_broadcaster_spawner = RegisterEventHandler(
-        event_handler=OnProcessExit(
-            target_action=joint_state_broadcaster_spawner,
-            on_exit=[robot_controller_spawner],
-        )
+
+    tool_communication_node = Node(
+        package="ur_robot_driver",
+        executable="tool_communication.py",
+        name="ur_tool_comm",
+        output="screen",
+        parameters=[
+            {
+                "robot_ip": robot_ip,
+                "tcp_port": 54321,
+                "device_name": "/tmp/ttyUR",
+            }
+        ],
     )
 
-    # Delay start of gripper_controller after `joint_state_broadcaster`
-    delay_gripper_controller_spawner_after_joint_state_broadcaster_spawner = RegisterEventHandler(
-        event_handler=OnProcessExit(
-            target_action=joint_state_broadcaster_spawner,
-            on_exit=[gripper_controller_spawner],
-        )
+    urscript_interface = Node(
+        package="ur_robot_driver",
+        executable="urscript_interface",
+        parameters=[{"robot_ip": robot_ip}],
+        output="screen",
+        condition=UnlessCondition(use_fake_hardware),
     )
 
     nodes_to_start = [
@@ -307,13 +317,17 @@ def generate_launch_description():
       gazebo,
       spawn_entity,
       delay_joint_state_broadcaster_spawner_after_spawn_entity,
-      delay_joint_state_broadcaster_spawner_after_control_node,
       robot_state_publisher_node,
       joint_state_publisher,
       delay_rviz_after_joint_state_broadcaster_spawner,
       control_node,
-      delay_robot_controller_spawner_after_joint_state_broadcaster_spawner,
-      delay_gripper_controller_spawner_after_joint_state_broadcaster_spawner,
+      robot_controller_spawner,
+      gripper_controller_spawner,
+      tool_communication_node,
+      urscript_interface,
+      speed_scaling_state_broadcaster,
+      joint_state_broadcaster_spawner,
+      io_and_status_controller,
     ]
 
     return LaunchDescription(declared_arguments + nodes_to_start)

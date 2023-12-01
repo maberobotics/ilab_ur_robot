@@ -192,11 +192,11 @@ def generate_launch_description():
         parameters=[
             robot_description,
             robot_description_semantic,
+            robot_description_kinematics,
             robot_description_planning_cartesian_limits,
             robot_description_planning_joint_limits,
             planning_pipelines_config,
             ompl_planning_config,
-            robot_description_kinematics,
             trajectory_execution,
             moveit_controllers,
             planning_scene_monitor_parameters,
