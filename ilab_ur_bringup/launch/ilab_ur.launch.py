@@ -55,7 +55,7 @@ def generate_launch_description():
     declared_arguments.append(
         DeclareLaunchArgument(
             'use_planning',
-            default_value='true',
+            default_value='false',
             description='Start robot with Moveit2 `move_group` planning \
                          config for Pilz and OMPL.',
         )
@@ -63,7 +63,7 @@ def generate_launch_description():
     declared_arguments.append(
         DeclareLaunchArgument(
             'start_rviz',
-            default_value='true',
+            default_value='false',
             description='Start RViz2 automatically with this launch file.',
         )
     )
@@ -85,7 +85,7 @@ def generate_launch_description():
     )
     declared_arguments.append(
         DeclareLaunchArgument(
-            'ur_namespace',
+            'namespace',
             default_value='/',
             description='Namespace of launched nodes, useful for multi-robot setup. \
                          If changed than also the namespace in the controllers \
@@ -115,7 +115,7 @@ def generate_launch_description():
     start_rviz = LaunchConfiguration('start_rviz')
     robot_ip = LaunchConfiguration('robot_ip')
     base_frame_file = LaunchConfiguration('base_frame_file')
-    namespace = LaunchConfiguration('ur_namespace')
+    namespace = LaunchConfiguration('namespace')
     start_gazebo = LaunchConfiguration('start_gazebo')
     merge_joint_states = LaunchConfiguration('merge_joint_states')
 
@@ -183,6 +183,7 @@ def generate_launch_description():
       output='both',
       parameters=[robot_description],
       namespace=namespace,
+      condition=IfCondition(start_rviz)
     )
 
     joint_state_publisher = Node(
