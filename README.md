@@ -29,3 +29,18 @@ ROS2 packages for the UR manipulator with a Robotiq gripper
     source install/setup.bash
     ```
 **NOTE:** The `ilab_ur_robot.repos` file contains links to ros2 packages that need to be source-built to use their newest features.
+
+## Usage
+The package comes with a general purpose launch file, which can be run using 
+```shell
+$ ros2 launch ilab_ur_bringup ilab_ur.launch.py
+```
+Several launch arguments can be used to adapt the launch. These arguments can be shown by running 
+```shell
+ros2 launch ilab_ur_bringup ilab_ur.launch.py --show-args
+```
+
+For example, to start the UR real robot with Moveit2 planning and Rviz2, run
+```shell
+ros2 launch ilab_ur_bringup ilab_ur.launch.py use_fake_hardware:=false use_planning:=true start_rviz:=true robot_ip:=172.16.0.3
+```
